@@ -2,7 +2,7 @@ export const schema = gql`
   type User {
     id: Int!
     username: String!
-    cards: [CreditCard]!
+    creditCards: [CreditCard]!
     createdAt: DateTime!
     updatedAt: DateTime!
   }

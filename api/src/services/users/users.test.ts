@@ -24,11 +24,11 @@ describe('users', () => {
 
   scenario('creates a user', async () => {
     const result = await createUser({
-      input: { username: 'String', updatedAt: '2022-10-21T22:06:45.482Z' },
+      input: { username: 'String', updatedAt: '2022-10-21T23:23:11.614Z' },
     })
 
     expect(result.username).toEqual('String')
-    expect(result.updatedAt).toEqual(new Date('2022-10-21T22:06:45.482Z'))
+    expect(result.updatedAt).toEqual(new Date('2022-10-21T23:23:11.614Z'))
   })
 
   scenario('updates a user', async (scenario: StandardScenario) => {

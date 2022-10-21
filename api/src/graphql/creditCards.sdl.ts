@@ -2,8 +2,8 @@ export const schema = gql`
   type CreditCard {
     id: Int!
     alias: String!
-    closingDate: DateTime!
-    dueDate: DateTime!
+    closingDate: Int!
+    dueDate: Int!
     createdAt: DateTime!
     updatedAt: DateTime!
     User: User!
@@ -17,15 +17,15 @@ export const schema = gql`
 
   input CreateCreditCardInput {
     alias: String!
-    closingDate: DateTime!
-    dueDate: DateTime!
+    closingDate: Int!
+    dueDate: Int!
     userId: Int!
   }
 
   input UpdateCreditCardInput {
     alias: String
-    closingDate: DateTime
-    dueDate: DateTime
+    closingDate: Int
+    dueDate: Int
     userId: Int
   }
 

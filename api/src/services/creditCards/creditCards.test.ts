@@ -35,17 +35,17 @@ describe('creditCards', () => {
     const result = await createCreditCard({
       input: {
         alias: 'String',
-        closingDate: '2022-10-21T22:07:01.056Z',
-        dueDate: '2022-10-21T22:07:01.056Z',
-        updatedAt: '2022-10-21T22:07:01.056Z',
+        closingDate: 3754609,
+        dueDate: 8292449,
+        updatedAt: '2022-10-21T23:23:03.470Z',
         userId: scenario.creditCard.two.userId,
       },
     })
 
     expect(result.alias).toEqual('String')
-    expect(result.closingDate).toEqual(new Date('2022-10-21T22:07:01.056Z'))
-    expect(result.dueDate).toEqual(new Date('2022-10-21T22:07:01.056Z'))
-    expect(result.updatedAt).toEqual(new Date('2022-10-21T22:07:01.056Z'))
+    expect(result.closingDate).toEqual(3754609)
+    expect(result.dueDate).toEqual(8292449)
+    expect(result.updatedAt).toEqual(new Date('2022-10-21T23:23:03.470Z'))
     expect(result.userId).toEqual(scenario.creditCard.two.userId)
   })
 

@@ -5,13 +5,17 @@ import type {
 } from 'types/graphql'
 
 import { db } from 'src/lib/db'
+import { creditCards } from '../creditCards/creditCards'
 
-export const userByUsername = ({ username }) => {
-  return db.user.findFirst({ where: { username } })
+export const getUserByUsername = ({ username }) => {
+  return db.user.findFirst({
+    where: { username },
+    include: { creditCards: true },
+  })
 }
 
 export const findOrCreateUserByUsername = async ({ username }) => {
-  const dbUser = await userByUsername({ username })
+  const dbUser = await getUserByUsername({ username })
   return dbUser === null ? await createUser({ input: { username } }) : dbUser
 }
 
@@ -45,7 +49,7 @@ export const deleteUser: MutationResolvers['deleteUser'] = ({ id }) => {
 }
 
 export const User: UserRelationResolvers = {
-  cards: (_obj, { root }) => {
-    return db.user.findUnique({ where: { id: root?.id } }).cards()
+  creditCards: (_obj, { root }) => {
+    return db.user.findUnique({ where: { id: root?.id } }).creditCards()
   },
 }

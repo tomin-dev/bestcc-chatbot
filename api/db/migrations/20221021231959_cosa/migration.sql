@@ -10,8 +10,8 @@ CREATE TABLE "User" (
 CREATE TABLE "CreditCard" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "alias" TEXT NOT NULL,
-    "closingDate" DATETIME NOT NULL,
-    "dueDate" DATETIME NOT NULL,
+    "closingDate" INTEGER NOT NULL,
+    "dueDate" INTEGER NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
     "userId" INTEGER NOT NULL,
