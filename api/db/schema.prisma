@@ -10,9 +10,22 @@ generator client {
 
 // Define your own datamodels here and run `yarn redwood prisma migrate dev`
 // to create migrations for them and apply to your dev DB.
-// TODO: Please remove the following example:
-model UserExample {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+model User {
+  id        Int          @id @default(autoincrement())
+  // the username will be the telegram username. e.g. roeeyn
+  username  String
+  cards     CreditCard[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model CreditCard {
+  id          Int      @id @default(autoincrement())
+  alias       String
+  closingDate DateTime // end of your billing cycle
+  dueDate     DateTime // date when you'll need to make at least the min payment
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  User        User     @relation(fields: [userId], references: [id])
+  userId      Int
 }
