@@ -44,7 +44,9 @@ export const getCreditCards = async (ctx: any) => {
   }
 
   const reply = user.creditCards
-    .map((creditCard: any) => creditCard.alias)
+    .map((creditCard: any) => {
+      return `${creditCard.alias}, corte: ${creditCard.closingDate}, pago: ${creditCard.dueDate}, id: ${creditCard.id}`
+    })
     .reduce((previousValue, currentValue) => {
       return `${previousValue}\n- ${currentValue}`
     }, 'Tarjetas:')

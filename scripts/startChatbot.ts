@@ -20,6 +20,8 @@ export default async ({ args }) => {
     }
   })
 
+  // TODO: Add remove credit card with id
+
   bot.command('tarjetas', async (ctx) => {
     try {
       await getCreditCards(ctx)
