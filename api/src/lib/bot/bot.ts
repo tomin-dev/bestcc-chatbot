@@ -1,4 +1,7 @@
-import { createCreditCard } from 'src/services/creditCards/creditCards'
+import {
+  createCreditCard,
+  deleteCreditCard,
+} from 'src/services/creditCards/creditCards'
 import { findOrCreateUserByUsername } from 'src/services/users/users'
 import { CreditCard } from '@prisma/client'
 
@@ -12,6 +15,12 @@ export const sendInstructions = async (ctx: any) => {
     `/mejorTarjeta\nTe mostrará la mejor tarjeta a usar hoy basado en la fecha de corte.`
   )
   await ctx.reply(`/tarjetas\nTe mostrará todas las tarjetas guardadas.`)
+  await ctx.reply(`/borrarTarjeta 420\nTe borrará la tarjeta con id 420.`)
+}
+
+export const getCCIdFromMessage = (message: string): number => {
+  const [, creditCardId] = message.match(/\/borrarTarjeta\s(\d+)(.*)/)
+  return +creditCardId
 }
 
 export const getCCDataFromMessage = (
@@ -48,6 +57,46 @@ export const getBestCreditCardForDay = (
   })
 }
 
+export const removeCC = async (ctx: any) => {
+  const username = ctx.message.from.username
+
+  if (username === null) {
+    return await ctx.reply(
+      'Tu usario no es válido. Intenta editarlo en Telegram.'
+    )
+  }
+
+  const user = await findOrCreateUserByUsername({ username })
+
+  if (user.creditCards === null || user.creditCards.length === 0) {
+    ctx.reply(`No tienes tarjetas guardadas`)
+    ctx.reply(`Para guardar una usa /crearTarjeta`)
+    return
+  }
+
+  const creditCardId = getCCIdFromMessage(ctx.message.text)
+  await deleteCreditCard({ id: creditCardId })
+
+  ctx.reply(`Tarjeta con id: ${creditCardId} eliminada.`)
+
+  const refreshedUser = await findOrCreateUserByUsername({ username })
+
+  if (refreshedUser.creditCards.length === 0) {
+    await ctx.reply(`No hay más tarjetas. Puedes agregar una con /crearTarjeta`)
+    return
+  }
+
+  const reply = refreshedUser.creditCards
+    .map((creditCard: any) => {
+      return `${creditCard.alias}, corte: ${creditCard.closingDate}, pago: ${creditCard.dueDate}, id: ${creditCard.id}`
+    })
+    .reduce((previousValue, currentValue) => {
+      return `${previousValue}\n- ${currentValue}`
+    }, 'El resto de tus tarjetas:')
+
+  await ctx.reply(reply)
+}
+
 export const getBestCreditCardForToday = async (ctx: any) => {
   const username = ctx.message.from.username
 
@@ -61,7 +110,7 @@ export const getBestCreditCardForToday = async (ctx: any) => {
 
   if (user.creditCards === null || user.creditCards.length === 0) {
     ctx.reply(`No tienes tarjetas guardadas`)
-    ctx.reply(`Para guardar una usa /crearTc`)
+    ctx.reply(`Para guardar una usa /crearTarjeta`)
     return
   }
 
@@ -90,7 +139,7 @@ export const getCreditCards = async (ctx: any) => {
 
   if (user.creditCards === null || user.creditCards.length === 0) {
     ctx.reply(`No tienes tarjetas guardadas`)
-    ctx.reply(`Para guardar una usa /crearTc`)
+    ctx.reply(`Para guardar una usa /crearTarjeta`)
     return
   }
 

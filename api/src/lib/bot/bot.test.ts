@@ -1,5 +1,21 @@
-import { getBestCreditCardForDay, getCCDataFromMessage } from 'src/lib/bot/bot'
+import {
+  getBestCreditCardForDay,
+  getCCDataFromMessage,
+  getCCIdFromMessage,
+} from 'src/lib/bot/bot'
 import { CreditCard } from '@prisma/client'
+
+describe('Get CC Id for removal', () => {
+  it('should get the number', () => {
+    const result = getCCIdFromMessage('/borrarTarjeta 20')
+    expect(result).toEqual(20)
+  })
+
+  it('should get the number even with extra stuff', () => {
+    const result = getCCIdFromMessage('/borrarTarjeta 20 for favor carnal')
+    expect(result).toEqual(20)
+  })
+})
 
 describe('Get CC Data From Message', () => {
   it('should handle 0 prepend digits', () => {

@@ -5,6 +5,7 @@ import {
   sendInstructions,
   getCreditCards,
   getBestCreditCardForToday,
+  removeCC,
 } from 'api/src/lib/bot/bot'
 
 import { Telegraf } from 'telegraf'
@@ -25,7 +26,14 @@ export default async ({ args }) => {
     }
   })
 
-  // TODO: Add remove credit card with id
+  bot.command('borrarTarjeta', async (ctx) => {
+    try {
+      await removeCC(ctx)
+    } catch (err) {
+      await ctx.reply(`No entendí tu mensaje, lo siento.`)
+      await sendInstructions(ctx)
+    }
+  })
 
   bot.command('tarjetas', async (ctx) => {
     try {
