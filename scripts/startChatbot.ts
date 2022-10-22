@@ -1,6 +1,11 @@
 // To access your database
 // Append api/* to import from api and web/* to import from web
-import { createCC, sendInstructions, getCreditCards } from 'api/src/lib/bot/bot'
+import {
+  createCC,
+  sendInstructions,
+  getCreditCards,
+  getBestCreditCardForToday,
+} from 'api/src/lib/bot/bot'
 
 import { Telegraf } from 'telegraf'
 
@@ -11,7 +16,7 @@ export default async ({ args }) => {
 
   const bot = new Telegraf(process.env.BOT_TOKEN)
 
-  bot.command('crearTc', async (ctx) => {
+  bot.command('crearTarjeta', async (ctx) => {
     try {
       await createCC(ctx)
     } catch (err) {
@@ -25,6 +30,15 @@ export default async ({ args }) => {
   bot.command('tarjetas', async (ctx) => {
     try {
       await getCreditCards(ctx)
+    } catch (err) {
+      await ctx.reply(`No entendí tu mensaje, lo siento.`)
+      await sendInstructions(ctx)
+    }
+  })
+
+  bot.command('mejorTarjeta', async (ctx) => {
+    try {
+      await getBestCreditCardForToday(ctx)
     } catch (err) {
       await ctx.reply(`No entendí tu mensaje, lo siento.`)
       await sendInstructions(ctx)
