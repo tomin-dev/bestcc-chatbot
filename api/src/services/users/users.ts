@@ -5,7 +5,6 @@ import type {
 } from 'types/graphql'
 
 import { db } from 'src/lib/db'
-import { creditCards } from '../creditCards/creditCards'
 
 export const getUserByUsername = ({ username }) => {
   return db.user.findFirst({
@@ -32,6 +31,7 @@ export const user: QueryResolvers['user'] = ({ id }) => {
 export const createUser: MutationResolvers['createUser'] = ({ input }) => {
   return db.user.create({
     data: input,
+    include: { creditCards: true },
   })
 }
 

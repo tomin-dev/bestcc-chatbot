@@ -39,22 +39,30 @@ export const getCCDataFromMessage = (
   return { closingDate: +closingDate, dueDate: +dueDate, alias }
 }
 
+export const getSortedCreditCardsForDay = (
+  creditCards: CreditCard[],
+  day: number
+): CreditCard[] => {
+  const furthest = creditCards
+    .filter((card) => day <= card.closingDate)
+    .sort((a: CreditCard, b: CreditCard) =>
+      a.closingDate > b.closingDate ? -1 : a.closingDate < b.closingDate ? 1 : 0
+    )
+
+  const closest = creditCards
+    .filter((card) => day > card.closingDate)
+    .sort((a: CreditCard, b: CreditCard) =>
+      a.closingDate > b.closingDate ? -1 : a.closingDate < b.closingDate ? 1 : 0
+    )
+
+  return [...closest, ...furthest]
+}
+
 export const getBestCreditCardForDay = (
   creditCards: CreditCard[],
   day: number
 ): CreditCard => {
-  const furthest = creditCards.filter((card) => day <= card.closingDate)
-  const closest = creditCards.filter((card) => day > card.closingDate)
-
-  if (closest.length > 0) {
-    return closest.reduce((prevCard, nextCard) => {
-      return nextCard.closingDate > prevCard.closingDate ? nextCard : prevCard
-    })
-  }
-
-  return furthest.reduce((prevCard, nextCard) => {
-    return nextCard.closingDate > prevCard.closingDate ? nextCard : prevCard
-  })
+  return getSortedCreditCardsForDay(creditCards, day)[0]
 }
 
 export const removeCC = async (ctx: any) => {
@@ -121,7 +129,7 @@ export const getBestCreditCardForToday = async (ctx: any) => {
     todaysNumber
   )
 
-  ctx.reply(
+  await ctx.reply(
     `La mejor tarjeta para hoy es:\n${bestCreditCard.alias}, corte: ${bestCreditCard.closingDate}, pago: ${bestCreditCard.dueDate}, id: ${bestCreditCard.id}`
   )
 }
@@ -143,13 +151,29 @@ export const getCreditCards = async (ctx: any) => {
     return
   }
 
-  const reply = user.creditCards
-    .map((creditCard: any) => {
-      return `${creditCard.alias}, corte: ${creditCard.closingDate}, pago: ${creditCard.dueDate}, id: ${creditCard.id}`
-    })
-    .reduce((previousValue, currentValue) => {
-      return `${previousValue}\n- ${currentValue}`
-    }, 'Tarjetas:')
+  await ctx.reply('Tus tarjetas por orden de beneficio:')
+
+  const todaysNumber = new Date().getDate()
+
+  const sortedCreditCards: CreditCard[] = getSortedCreditCardsForDay(
+    user.creditCards as CreditCard[],
+    todaysNumber
+  )
+
+  const reply: string = sortedCreditCards
+    .map(
+      (card: CreditCard, idx: number) =>
+        `${idx + 1}.${
+          idx === 0
+            ? '(Mejor)'
+            : idx === user.creditCards.length - 1
+            ? '(Peor)'
+            : ''
+        } ${card.alias}, corte: ${card.closingDate}, pago: ${
+          card.dueDate
+        }, id: ${card.id}`
+    )
+    .join('\n')
 
   await ctx.reply(reply)
 }
