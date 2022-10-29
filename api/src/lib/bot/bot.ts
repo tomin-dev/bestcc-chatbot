@@ -4,6 +4,10 @@ import {
 } from 'src/services/creditCards/creditCards'
 import { findOrCreateUserByUsername } from 'src/services/users/users'
 import { CreditCard } from '@prisma/client'
+import {
+  getSortedCreditCardsForDay,
+  getBestCreditCardForDay,
+} from 'src/lib/cards/cards'
 
 export const sendInstructions = async (ctx: any) => {
   await ctx.reply(`Los comandos disponibles son:`)
@@ -37,32 +41,6 @@ export const getCCDataFromMessage = (
   }
 
   return { closingDate: +closingDate, dueDate: +dueDate, alias }
-}
-
-export const getSortedCreditCardsForDay = (
-  creditCards: CreditCard[],
-  day: number
-): CreditCard[] => {
-  const furthest = creditCards
-    .filter((card) => day <= card.closingDate)
-    .sort((a: CreditCard, b: CreditCard) =>
-      a.closingDate > b.closingDate ? -1 : a.closingDate < b.closingDate ? 1 : 0
-    )
-
-  const closest = creditCards
-    .filter((card) => day > card.closingDate)
-    .sort((a: CreditCard, b: CreditCard) =>
-      a.closingDate > b.closingDate ? -1 : a.closingDate < b.closingDate ? 1 : 0
-    )
-
-  return [...closest, ...furthest]
-}
-
-export const getBestCreditCardForDay = (
-  creditCards: CreditCard[],
-  day: number
-): CreditCard => {
-  return getSortedCreditCardsForDay(creditCards, day)[0]
 }
 
 export const removeCC = async (ctx: any) => {

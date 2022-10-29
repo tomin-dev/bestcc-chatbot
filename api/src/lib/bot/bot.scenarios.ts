@@ -1,4 +1,3 @@
-
 export const standard = defineScenario({
   user: {
     one: {
@@ -8,12 +7,12 @@ export const standard = defineScenario({
           create: [
             {
               closingDate: 27,
-            }
-          ]
+            },
+          ],
         },
         include: {
-          creditCards: true
-        }
+          creditCards: true,
+        },
       },
     },
     // two: {
