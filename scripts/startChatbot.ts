@@ -2,10 +2,11 @@
 // Append api/* to import from api and web/* to import from web
 import {
   createCC,
-  sendInstructions,
   getCreditCards,
   getBestCreditCardForToday,
   removeCC,
+  sendGreetings,
+  safeCallbackWrapper,
 } from 'api/src/lib/bot/bot'
 
 import { Telegraf } from 'telegraf'
@@ -17,47 +18,29 @@ export default async ({ args }) => {
 
   const bot = new Telegraf(process.env.BOT_TOKEN)
 
-  bot.command('crearTarjeta', async (ctx) => {
-    try {
-      await createCC(ctx)
-    } catch (err) {
-      await ctx.reply(`No entendí tu mensaje, lo siento.`)
-      await sendInstructions(ctx)
-    }
-  })
+  bot.start(async (ctx) => await sendGreetings(ctx))
 
-  bot.command('borrarTarjeta', async (ctx) => {
-    try {
-      await removeCC(ctx)
-    } catch (err) {
-      await ctx.reply(`No entendí tu mensaje, lo siento.`)
-      await sendInstructions(ctx)
-    }
-  })
+  bot.command(
+    'crearTarjeta',
+    async (ctx) => await safeCallbackWrapper(ctx)(createCC)
+  )
 
-  bot.command('tarjetas', async (ctx) => {
-    try {
-      await getCreditCards(ctx)
-    } catch (err) {
-      await ctx.reply(`No entendí tu mensaje, lo siento.`)
-      await sendInstructions(ctx)
-    }
-  })
+  bot.command(
+    'borrarTarjeta',
+    async (ctx) => await safeCallbackWrapper(ctx)(removeCC)
+  )
 
-  bot.command('mejorTarjeta', async (ctx) => {
-    try {
-      await getBestCreditCardForToday(ctx)
-    } catch (err) {
-      await ctx.reply(`No entendí tu mensaje, lo siento.`)
-      await sendInstructions(ctx)
-    }
-  })
+  bot.command(
+    'tarjetas',
+    async (ctx) => await safeCallbackWrapper(ctx)(getCreditCards)
+  )
 
-  bot.on('text', async (ctx) => {
-    const username = ctx.message.from.username || 'desconocido'
-    await ctx.reply(`Hola ${username}! 👋`)
-    await sendInstructions(ctx)
-  })
+  bot.command(
+    'mejorTarjeta',
+    async (ctx) => await safeCallbackWrapper(ctx)(getBestCreditCardForToday)
+  )
+
+  bot.on('text', async (ctx) => await sendGreetings(ctx))
 
   bot.launch()
 

@@ -9,6 +9,15 @@ import {
   getBestCreditCardForDay,
 } from 'src/lib/cards/cards'
 
+export const safeCallbackWrapper = (ctx: any) => async (fun: Function) => {
+  try {
+    await fun(ctx)
+  } catch (err) {
+    await ctx.reply(`No entendí tu mensaje, lo siento.`)
+    await sendInstructions(ctx)
+  }
+}
+
 export const sendInstructions = async (ctx: any) => {
   await ctx.reply(`Los comandos disponibles son:`)
   await ctx.reply(
@@ -20,6 +29,12 @@ export const sendInstructions = async (ctx: any) => {
   )
   await ctx.reply(`/tarjetas\nTe mostrará todas las tarjetas guardadas.`)
   await ctx.reply(`/borrarTarjeta 420\nTe borrará la tarjeta con id 420.`)
+}
+
+export const sendGreetings = async (ctx: any) => {
+  const username = ctx.message.from.username || 'desconocido'
+  await ctx.reply(`Hola ${username}! 👋`)
+  await sendInstructions(ctx)
 }
 
 export const getCCIdFromMessage = (message: string): number => {
@@ -168,7 +183,12 @@ export const createCC = async (ctx: any) => {
   const user = await findOrCreateUserByUsername({ username })
   const { closingDate, dueDate, alias } = getCCDataFromMessage(ctx.message.text)
 
-  // TODO: handle duplicates better
+  const existingAlias = user.creditCards.map((card) => card.alias)
+  if (existingAlias.includes(alias)) {
+    return await ctx.reply(
+      `El alias ${alias} ya existe. Intenta con otro por favor`
+    )
+  }
 
   const creditCard = await createCreditCard({
     input: { closingDate, dueDate, alias, userId: user.id },
