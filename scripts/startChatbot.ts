@@ -18,7 +18,11 @@ export default async ({ args }) => {
 
   const bot = new Telegraf(process.env.BOT_TOKEN)
 
-  bot.start(async (ctx) => await sendGreetings(ctx))
+  bot.start(async (ctx) => await safeCallbackWrapper(ctx)(sendGreetings))
+
+  bot.help(async (ctx) => await safeCallbackWrapper(ctx)(sendGreetings))
+
+  bot.settings(async (ctx) => await safeCallbackWrapper(ctx)(sendGreetings))
 
   bot.command(
     'crearTarjeta',
@@ -40,7 +44,7 @@ export default async ({ args }) => {
     async (ctx) => await safeCallbackWrapper(ctx)(getBestCreditCardForToday)
   )
 
-  bot.on('text', async (ctx) => await sendGreetings(ctx))
+  bot.on('text', async (ctx) => await safeCallbackWrapper(ctx)(sendGreetings))
 
   bot.launch()
 
