@@ -58,6 +58,4 @@ bot.command(
 
 bot.on("message", async (ctx) => await safeCallbackWrapper(ctx)(sendGreetings));
 
-bot.on("message", async (ctx) => await ctx.reply('hola prrito'));
-
 bot.start();
