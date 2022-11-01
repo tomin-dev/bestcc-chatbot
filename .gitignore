@@ -5,6 +5,7 @@
 .redwood
 dev.db*
 dist
+build
 dist-babel
 node_modules
 yarn-error.log

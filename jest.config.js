@@ -1,8 +1,8 @@
-// This the Redwood root jest config
-// Each side, e.g. ./web/ and ./api/ has specific config that references this root
-// More info at https://redwoodjs.com/docs/project-configuration-dev-test-build
-
+/** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
-  rootDir: '.',
-  projects: ['<rootDir>/{*,!(node_modules)/**/}/jest.config.js'],
-}
+    preset: "ts-jest",
+    testEnvironment: "node",
+    moduleNameMapper: {
+      "^src/(.*)$": "<rootDir>/src/$1",
+    },
+  };
