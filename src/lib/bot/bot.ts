@@ -11,6 +11,10 @@ import {
 
 export const safeCallbackWrapper = (ctx: any) => async (fun: Function) => {
   try {
+    await ctx.api.setChatMenuButton({
+      chat_id: ctx.message?.from.id,
+      menu_button: { type: "commands" },
+    });
     await fun(ctx);
   } catch (err) {
     await ctx.reply(`No entendí tu mensaje, lo siento.`);
@@ -21,14 +25,14 @@ export const safeCallbackWrapper = (ctx: any) => async (fun: Function) => {
 export const sendInstructions = async (ctx: any) => {
   await ctx.reply(`Los comandos disponibles son:`);
   await ctx.reply(
-    `/crearTarjeta 19 07 mi super tarjeta\nTe creará la tarjeta de crédito con la fecha de corte los` +
+    `/creartarjeta 19 07 mi super tarjeta\nTe creará la tarjeta de crédito con la fecha de corte los` +
       ` días 19, la fecha límite de pago el 07, y el alias 'mi super tarjeta'`
   );
   await ctx.reply(
-    `/mejorTarjeta\nTe mostrará la mejor tarjeta a usar hoy basado en la fecha de corte.`
+    `/mejortarjeta\nTe mostrará la mejor tarjeta a usar hoy basado en la fecha de corte.`
   );
   await ctx.reply(`/tarjetas\nTe mostrará todas las tarjetas guardadas.`);
-  await ctx.reply(`/borrarTarjeta 420\nTe borrará la tarjeta con id 420.`);
+  await ctx.reply(`/borrartarjeta 420\nTe borrará la tarjeta con id 420.`);
 };
 
 export const sendGreetings = async (ctx: any) => {
@@ -39,7 +43,7 @@ export const sendGreetings = async (ctx: any) => {
 
 export const getCCIdFromMessage = (message: string): number => {
   // @ts-ignore
-  const [, creditCardId] = message.match(/\/borrarTarjeta\s(\d+)(.*)/);
+  const [, creditCardId] = message.match(/\/borrartarjeta\s(\d+)(.*)/);
   return +creditCardId;
 };
 
@@ -50,7 +54,7 @@ export const getCCDataFromMessage = (
 
   // @ts-ignore
   const [, closingDate, dueDate, alias] = message.match(
-    /\/crearTarjeta\s(\d{1,2})\s(\d{1,2})\s(.*)/
+    /\/creartarjeta\s(\d{1,2})\s(\d{1,2})\s(.*)/
   );
 
   if (+closingDate > 31 || +dueDate > 31 || +closingDate < 1 || +dueDate < 1) {
