@@ -6,10 +6,19 @@ import {
   sendGreetings,
   safeCallbackWrapper,
 } from "./lib/bot/bot";
-import { Bot, CommandContext, Context } from "grammy";
+import {
+  type Conversation,
+  type ConversationFlavor,
+  conversations,
+  createConversation,
+} from "@grammyjs/conversations";
+import { Bot, Context, session } from "grammy";
 import * as dotenv from "dotenv"; // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
 
 dotenv.config();
+
+type MyContext = Context & ConversationFlavor;
+type MyConversation = Conversation<MyContext>;
 
 console.log("Starting script...");
 const botToken = process.env.BOT_TOKEN;
@@ -19,7 +28,34 @@ if (botToken === undefined) {
 }
 
 // Create an instance of the `Bot` class and pass your authentication token to it.
-const bot = new Bot(botToken); // <-- put your authentication token between the ""
+const bot = new Bot<MyContext>(botToken); // <-- put your authentication token between the ""
+
+bot.use(session({ initial: () => ({}) }));
+bot.use(conversations());
+
+/** Defines the conversation */
+async function createCardConvo(conversation: MyConversation, ctx: MyContext) {
+  // TODO: code the conversation
+  await ctx.reply('Write my your first number')
+  const { msg: { text: firstNumber } } = await conversation.waitFor("message:text");
+  await ctx.reply('Write my your second number')
+  const { msg: { text: secondNumber } } = await conversation.waitFor("message:text");
+  await ctx.reply('Write my your third number')
+  // const { msg: { text: thirdNumber } } = await conversation.waitFor("message:text");
+  const thirdNumber: number = await conversation.form.number();
+
+  await ctx.reply(`Your result: ${firstNumber + secondNumber + thirdNumber}`)
+  // Explicit return helps to leave the convo
+  // https://grammy.dev/plugins/conversations.html#leaving-a-conversation
+  return
+}
+
+bot.use(createConversation(createCardConvo));
+
+bot.command("convo", async (ctx) => {
+  // enter the function "greeting" you declared
+  await ctx.conversation.enter("createCardConvo");
+});
 
 bot.command(
   "start",
@@ -56,6 +92,12 @@ bot.command(
   async (ctx) => await safeCallbackWrapper(ctx)(getBestCreditCardForToday)
 );
 
+// Always exit any conversation upon /cancel
+bot.command("cancel", async (ctx) => {
+  await ctx.conversation.exit();
+  await ctx.reply("Proceso cancelado. Si quieres crear otra tarjeata usa /creartarjeta");
+});
+
 bot.api.setMyCommands(
   [
     { command: "start", description: "Empezar a usar el bot" },
@@ -82,6 +124,9 @@ bot.api.setMyCommands(
   { scope: { type: "all_private_chats" } }
 );
 
-bot.on("message", async (ctx) => await safeCallbackWrapper(ctx)(sendGreetings));
+// bot.on("message", async (ctx) => await safeCallbackWrapper(ctx)(sendGreetings));
+bot.on("message", async (ctx) => {
+  ctx.reply(`Perdid@? Usa el comando /help para ayuda`)
+})
 
 bot.start();
