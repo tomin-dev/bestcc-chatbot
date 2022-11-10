@@ -16,6 +16,7 @@
     "build": "rm -rf build/ && tsc --build",
     "clean": "rm -rf build/ && tsc --build --clean",
     "test": "jest",
-    "dev": "nodemon src/bot.ts"
+    "dev": "nodemon src/bot.ts",
+    "prisma-generate": "prisma generate"
   }
 }

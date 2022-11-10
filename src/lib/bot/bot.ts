@@ -32,6 +32,7 @@ export const safeCallbackWrapper =
         },
       });
     } catch (err) {
+      console.error('Bot error:', err)
       await ctx.reply(`No entendí tu mensaje, lo siento.`);
       await sendInstructions(ctx);
     }
