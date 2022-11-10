@@ -23,7 +23,7 @@ model User {
 model Event {
   id        Int      @id @default(autoincrement())
   type      String
-  message String
+  message   String
   User      User     @relation(fields: [userId], references: [id])
   userId    Int
   createdAt DateTime @default(now())
