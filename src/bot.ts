@@ -23,37 +23,42 @@ const bot = new Bot(botToken); // <-- put your authentication token between the 
 
 bot.command(
   "start",
-  async (ctx) => await safeCallbackWrapper(ctx)(sendGreetings)
+  async (ctx) => await safeCallbackWrapper(ctx)("startCommand")(sendGreetings)
 );
 
 bot.command(
   "help",
-  async (ctx) => await safeCallbackWrapper(ctx)(sendGreetings)
+  async (ctx) => await safeCallbackWrapper(ctx)("helpCommand")(sendGreetings)
 );
 
 bot.command(
   "settings",
-  async (ctx) => await safeCallbackWrapper(ctx)(sendGreetings)
+  async (ctx) =>
+    await safeCallbackWrapper(ctx)("settingsCommand")(sendGreetings)
 );
 
 bot.command(
   "creartarjeta",
-  async (ctx) => await safeCallbackWrapper(ctx)(createCC)
+  async (ctx) => await safeCallbackWrapper(ctx)("createCardCommand")(createCC)
 );
 
 bot.command(
   "borrartarjeta",
-  async (ctx) => await safeCallbackWrapper(ctx)(removeCC)
+  async (ctx) => await safeCallbackWrapper(ctx)("removeCardCommand")(removeCC)
 );
 
 bot.command(
   "tarjetas",
-  async (ctx) => await safeCallbackWrapper(ctx)(getCreditCards)
+  async (ctx) =>
+    await safeCallbackWrapper(ctx)("getCardsCommand")(getCreditCards)
 );
 
 bot.command(
   "mejortarjeta",
-  async (ctx) => await safeCallbackWrapper(ctx)(getBestCreditCardForToday)
+  async (ctx) =>
+    await safeCallbackWrapper(ctx)("getBestCardCommand")(
+      getBestCreditCardForToday
+    )
 );
 
 bot.api.setMyCommands(
@@ -82,6 +87,9 @@ bot.api.setMyCommands(
   { scope: { type: "all_private_chats" } }
 );
 
-bot.on("message", async (ctx) => await safeCallbackWrapper(ctx)(sendGreetings));
+bot.on(
+  "message",
+  async (ctx) => await safeCallbackWrapper(ctx)("genericMessage")(sendGreetings)
+);
 
 bot.start();

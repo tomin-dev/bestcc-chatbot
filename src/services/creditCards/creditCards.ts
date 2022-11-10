@@ -1,6 +1,5 @@
 import { db } from "../../lib/db";
 
-
 export const createCreditCard = ({ input }: { input: any }) => {
   return db.creditCard.create({
     data: input,
