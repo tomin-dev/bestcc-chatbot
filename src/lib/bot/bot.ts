@@ -8,19 +8,35 @@ import {
   getSortedCreditCardsForDay,
   getBestCreditCardForDay,
 } from "../../lib/cards/cards";
+import { safeCreateEvent } from "../../services/events/events";
 
-export const safeCallbackWrapper = (ctx: any) => async (fun: Function) => {
-  try {
-    await ctx.api.setChatMenuButton({
-      chat_id: ctx.message?.from.id,
-      menu_button: { type: "commands" },
-    });
-    await fun(ctx);
-  } catch (err) {
-    await ctx.reply(`No entendí tu mensaje, lo siento.`);
-    await sendInstructions(ctx);
-  }
-};
+export const safeCallbackWrapper =
+  (ctx: any) => (type: string) => async (fun: Function) => {
+    try {
+      await ctx.api.setChatMenuButton({
+        chat_id: ctx.message?.from.id,
+        menu_button: { type: "commands" },
+      });
+
+      await fun(ctx);
+
+      const user = await findOrCreateUserByUsername({
+        username: ctx.message.from.username,
+      });
+
+      await safeCreateEvent({
+        input: {
+          type: type,
+          userId: user.id,
+          message: ctx.message.text || "N/A",
+        },
+      });
+    } catch (err) {
+      console.error('Bot error:', err)
+      await ctx.reply(`No entendí tu mensaje, lo siento.`);
+      await sendInstructions(ctx);
+    }
+  };
 
 export const sendInstructions = async (ctx: any) => {
   await ctx.reply(`Los comandos disponibles son:`);

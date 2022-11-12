@@ -17,6 +17,16 @@ model User {
   creditCards CreditCard[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  Event       Event[]
+}
+
+model Event {
+  id        Int      @id @default(autoincrement())
+  type      String
+  message   String
+  User      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
 }
 
 model CreditCard {
