@@ -11,19 +11,19 @@ export async function feedback(conversation: MyConversation, ctx: MyContext) {
     msg: { text },
   } = await conversation.waitFor("message:text");
 
-  const user = await findOrCreateUserByUsername({
-    username: ctx.message?.from?.username || "roeeyn",
-  });
+  await conversation.external(async () => {
+    const user = await findOrCreateUserByUsername({
+      username: ctx.message?.from?.username || "roeeyn",
+    });
 
-  await conversation.external(() =>
-    safeCreateEvent({
+    await safeCreateEvent({
       input: {
         type: "feedback",
         userId: user.id,
         message: text || "N/A",
       },
-    })
-  );
+    });
+  });
   await ctx.reply(
     `Gracias por tu comentario! Juntos hacemos que este servicio sea mejor.`
   );
