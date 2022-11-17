@@ -5,8 +5,16 @@ import {
   removeCC,
   sendGreetings,
   safeCallbackWrapper,
+  giveFeedback,
 } from "./lib/bot/bot";
-import { Bot, CommandContext, Context } from "grammy";
+import { feedback } from "./lib/convos/convos";
+import { Bot, Context, session } from "grammy";
+import {
+  type Conversation,
+  type ConversationFlavor,
+  conversations,
+  createConversation,
+} from "@grammyjs/conversations";
 import * as dotenv from "dotenv"; // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
 
 dotenv.config();
@@ -18,8 +26,26 @@ if (botToken === undefined) {
   throw new Error('The bot token is not set. Uset the ".env" file to set it.');
 }
 
+export type MyContext = Context & ConversationFlavor;
+export type MyConversation = Conversation<MyContext>;
+
 // Create an instance of the `Bot` class and pass your authentication token to it.
-const bot = new Bot(botToken); // <-- put your authentication token between the ""
+const bot = new Bot<MyContext>(botToken); // <-- put your authentication token between the ""
+
+// Install the session plugin.
+bot.use(
+  session({
+    initial() {
+      // return empty object for now
+      return {};
+    },
+  })
+);
+
+// Install the conversations plugin.
+bot.use(conversations());
+
+bot.use(createConversation(feedback));
 
 bot.command(
   "start",
@@ -54,6 +80,11 @@ bot.command(
 );
 
 bot.command(
+  "feedback",
+  async (ctx) => await safeCallbackWrapper(ctx)(null)(giveFeedback)
+);
+
+bot.command(
   "mejortarjeta",
   async (ctx) =>
     await safeCallbackWrapper(ctx)("getBestCardCommand")(
@@ -82,6 +113,10 @@ bot.api.setMyCommands(
     {
       command: "mejortarjeta",
       description: "Obtén la mejor tarjeta registrada a usar el día de hoy",
+    },
+    {
+      command: "feedback",
+      description: "Danos tu opinión de este bot.",
     },
   ],
   { scope: { type: "all_private_chats" } }

@@ -9,9 +9,10 @@ import {
   getBestCreditCardForDay,
 } from "../../lib/cards/cards";
 import { safeCreateEvent } from "../../services/events/events";
+import { type MyContext } from "../../bot";
 
 export const safeCallbackWrapper =
-  (ctx: any) => (type: string) => async (fun: Function) => {
+  (ctx: any) => (type: string | null) => async (fun: Function) => {
     try {
       await ctx.api.setChatMenuButton({
         chat_id: ctx.message?.from.id,
@@ -24,15 +25,16 @@ export const safeCallbackWrapper =
         username: ctx.message.from.username,
       });
 
-      await safeCreateEvent({
-        input: {
-          type: type,
-          userId: user.id,
-          message: ctx.message.text || "N/A",
-        },
-      });
+      type &&
+        (await safeCreateEvent({
+          input: {
+            type: type,
+            userId: user.id,
+            message: ctx.message.text || "N/A",
+          },
+        }));
     } catch (err) {
-      console.error('Bot error:', err)
+      console.error("Bot error:", err);
       await ctx.reply(`No entendí tu mensaje, lo siento.`);
       await sendInstructions(ctx);
     }
@@ -49,6 +51,11 @@ export const sendInstructions = async (ctx: any) => {
   );
   await ctx.reply(`/tarjetas\nTe mostrará todas las tarjetas guardadas.`);
   await ctx.reply(`/borrartarjeta 420\nTe borrará la tarjeta con id 420.`);
+  await ctx.reply(`/feedback\nDa tu opinión de este bot.`);
+};
+
+export const giveFeedback = async (ctx: MyContext) => {
+  await ctx.conversation.enter("feedback");
 };
 
 export const sendGreetings = async (ctx: any) => {
